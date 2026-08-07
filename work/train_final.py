@@ -83,7 +83,17 @@ MLP_W = 0.20
 #   추론은 quantiles_/references_ 만 저장해 numpy 로 재현 (sklearn 버전 의존 제거,
 #   sklearn 대비 오차 0.000e+00 검증됨).
 USE_MLP2 = True
-MLP2_W = __W2__
+MLP2_W = 0.20
+
+# 세 번째 MLP — 피처 70% 무작위 부분집합 (random subspace).
+#   전처리가 아니라 '보는 피처'를 줄여 다양성을 만든다. MLP1 상관 0.898.
+#   M1 0.20 + A 0.20 위에 E 0.15 를 얹으면 평균 662.1 -> 666.2, 양쪽 폴드 개선.
+#   E 가중치 0.05~0.25 전 구간이 양쪽 개선인 고원(최고 0.15).
+#   4번째(C 결측표시자)는 +0.7 뿐이라 복잡도 대비 무의미 -> 3멤버에서 끊는다.
+USE_MLP3 = True
+MLP3_W = 0.15
+MLP3_FEAT_FRAC = 0.7
+MLP3_FEAT_SEED = 0
 
 # ---- 전방검증으로 확정한 상수 ----
 PARAMS = dict(objective="binary", verbose=-1, num_threads=6, force_row_wise=True,
@@ -271,12 +281,46 @@ def main():
                 arr2[f"s{i}_b{j}"] = np.asarray(b_, np.float64)
         np.savez(f"{OUT}/mlp2.npz", **arr2)
 
+    # ---------- MLP3 (피처 70% 부분집합) ----------
+    z_mlp3_all = None
+    if USE_MLP3:
+        rng_ = np.random.default_rng(MLP3_FEAT_SEED)
+        sub_idx = np.sort(rng_.choice(len(feats), int(len(feats) * MLP3_FEAT_FRAC),
+                                      replace=False))
+        As, Bs = ((A - mu) / sd)[:, sub_idx], ((B - mu) / sd)[:, sub_idx]
+        acc3, packs3 = [], []
+        for s_ in range(MLP_SEEDS):
+            mm = MLPClassifier(hidden_layer_sizes=MLP_HIDDEN, alpha=MLP_ALPHA,
+                               batch_size=4096, learning_rate_init=1e-3, max_iter=150,
+                               early_stopping=True, n_iter_no_change=10,
+                               validation_fraction=0.1, random_state=s_)
+            mm.fit(As, y)
+            h = Bs
+            for W_, b_ in zip(mm.coefs_[:-1], mm.intercepts_[:-1]):
+                h = np.maximum(h @ W_ + b_, 0.0)
+            acc3.append((h @ mm.coefs_[-1] + mm.intercepts_[-1]).ravel())
+            packs3.append(mm)
+            print(f"  MLP3 seed {s_} 완료 ({mm.n_iter_} epoch)")
+        z_mlp3_all = np.mean(acc3, axis=0)
+        arr3 = {"feat_idx": sub_idx.astype(np.int64),
+                "n_seeds": np.array([MLP_SEEDS]),
+                "n_layers": np.array([len(packs3[0].coefs_)])}
+        for i, mm in enumerate(packs3):
+            for j, (W_, b_) in enumerate(zip(mm.coefs_, mm.intercepts_)):
+                arr3[f"s{i}_W{j}"] = np.asarray(W_, np.float64)
+                arr3[f"s{i}_b{j}"] = np.asarray(b_, np.float64)
+        np.savez(f"{OUT}/mlp3.npz", **arr3)
+
     # ---------- 블렌드 -> 볼카운트 보정 -> game_type 별 레벨 시프트 ----------
     z = (1 - BLEND_W) * z_lgb_all + BLEND_W * z_lr_all
     w2_ = MLP2_W if USE_MLP2 else 0.0
+    w3_ = MLP3_W if USE_MLP3 else 0.0
     if USE_MLP:
-        z = (1 - MLP_W - w2_) * z + MLP_W * z_mlp_all + (w2_ * z_mlp2_all if USE_MLP2 else 0.0)
-        print(f"  MLP 블렌드 적용 (MLP1 {MLP_W} / MLP2 {w2_})")
+        z = ((1 - MLP_W - w2_ - w3_) * z + MLP_W * z_mlp_all
+             + (w2_ * z_mlp2_all if USE_MLP2 else 0.0)
+             + (w3_ * z_mlp3_all if USE_MLP3 else 0.0))
+        print(f"  MLP 블렌드 적용 (MLP1 {MLP_W} / MLP2 {w2_} / MLP3 {w3_}, "
+              f"base {1-MLP_W-w2_-w3_:.2f})")
     if COUNT_CAL:
         cd = d["cnt_diff"].to_numpy()
         z = z + np.array([COUNT_CAL.get(str(int(v)), 0.0) for v in cd])
@@ -298,6 +342,7 @@ def main():
                 decay_halflife=DECAY_HALFLIFE,
                 use_mlp=USE_MLP, mlp_w=MLP_W,
                 use_mlp2=USE_MLP2, mlp2_w=MLP2_W,
+                use_mlp3=USE_MLP3, mlp3_w=MLP3_W,
                 use_prior=USE_PRIOR, prior_decay=PRIOR_DECAY,
                 prior_tables=(sorted(tables) if USE_PRIOR else []),
                 count_cal=COUNT_CAL,

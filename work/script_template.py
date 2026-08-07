@@ -105,8 +105,21 @@ def main():
                 a2 += (h @ m2[f"s{i}_W{nl2-1}"] + m2[f"s{i}_b{nl2-1}"]).ravel()
             z_mlp2 = a2 / ns2
             mw2 = meta["mlp2_w"]
-        z = (1 - mw - mw2) * z + mw * z_mlp + mw2 * z_mlp2
-        print(f"MLP 블렌드 적용: MLP1 {mw} / MLP2 {mw2}")
+        z_mlp3, mw3 = 0.0, 0.0
+        if meta.get("use_mlp3"):
+            m3 = np.load(os.path.join(MODEL_DIR, "mlp3.npz"))
+            ns3, nl3 = int(m3["n_seeds"][0]), int(m3["n_layers"][0])
+            Bs = Bn[:, m3["feat_idx"]]
+            a3 = np.zeros(len(Bs), dtype=np.float64)
+            for i in range(ns3):
+                h = Bs
+                for j in range(nl3 - 1):
+                    h = np.maximum(h @ m3[f"s{i}_W{j}"] + m3[f"s{i}_b{j}"], 0.0)
+                a3 += (h @ m3[f"s{i}_W{nl3-1}"] + m3[f"s{i}_b{nl3-1}"]).ravel()
+            z_mlp3 = a3 / ns3
+            mw3 = meta["mlp3_w"]
+        z = (1 - mw - mw2 - mw3) * z + mw * z_mlp + mw2 * z_mlp2 + mw3 * z_mlp3
+        print(f"MLP 블렌드: MLP1 {mw} / MLP2 {mw2} / MLP3 {mw3}, base {1-mw-mw2-mw3:.2f}")
     cc = meta.get("count_cal") or {}
     if cc:
         z = z + np.array([cc.get(str(int(v)), 0.0) for v in d["cnt_diff"].to_numpy()])
