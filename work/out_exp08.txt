@@ -1,0 +1,40 @@
+
+=== train<=2022 -> 2023 (R채점, 판별력 기준) ===
+  LGBM 단일시드                  판별=  471.0
+  LGBM 5시드 로짓평균            판별=  490.3
+C:\Users\noc07\OneDrive\Desktop\류민기\work\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:1457: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=6', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+  로지스틱 C=0.003                 판별=  534.6
+C:\Users\noc07\OneDrive\Desktop\류민기\work\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:1457: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=6', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+  로지스틱 C=0.01                  판별=  536.5
+C:\Users\noc07\OneDrive\Desktop\류민기\work\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:1457: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=6', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+  로지스틱 C=0.1                   판별=  536.6
+  블렌드 로지스틱비중 0.0           판별=  490.3
+  블렌드 로지스틱비중 0.2           판별=  529.0
+  블렌드 로지스틱비중 0.3           판별=  542.8
+  블렌드 로지스틱비중 0.4           판별=  552.9
+  블렌드 로지스틱비중 0.5           판별=  559.3
+  블렌드 로지스틱비중 0.7           판별=  561.2
+  블렌드 로지스틱비중 1.0           판별=  536.5
+
+=== train<=2023 -> 2024 (R채점, 판별력 기준) ===
+  LGBM 단일시드                  판별=  698.0
+  LGBM 5시드 로짓평균            판별=  718.6
+C:\Users\noc07\OneDrive\Desktop\류민기\work\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:1457: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=6', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+  로지스틱 C=0.003                 판별=  637.8
+C:\Users\noc07\OneDrive\Desktop\류민기\work\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:1457: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=6', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+  로지스틱 C=0.01                  판별=  637.4
+C:\Users\noc07\OneDrive\Desktop\류민기\work\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:1457: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=6', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+  로지스틱 C=0.1                   판별=  637.4
+  블렌드 로지스틱비중 0.0           판별=  718.6
+  블렌드 로지스틱비중 0.2           판별=  733.1
+  블렌드 로지스틱비중 0.3           판별=  734.7
+  블렌드 로지스틱비중 0.4           판별=  732.3
+  블렌드 로지스틱비중 0.5           판별=  726.2
+  블렌드 로지스틱비중 0.7           판별=  702.2
+  블렌드 로지스틱비중 1.0           판별=  637.4

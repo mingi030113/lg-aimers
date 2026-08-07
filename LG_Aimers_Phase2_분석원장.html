@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LG Aimers Phase2 — 제구 예측 분석 원장</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+</style>
+</head>
+<body><style>
+  :root {
+    --paper:      #E9ECEF;
+    --card:       #F5F7F8;
+    --ink:        #12171E;
+    --ink-soft:   #4C5661;
+    --ink-faint:  #7B858F;
+    --rule:       #C6CCD3;
+    --rule-soft:  #DCE1E6;
+    --seam:       #A81D33;
+    --chalk:      #23607F;
+    --amber:      #8A6414;
+    --shadow:     0 1px 0 rgba(18,23,30,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:     #0E1318;
+      --card:      #161C23;
+      --ink:       #E4E9ED;
+      --ink-soft:  #A2ADB7;
+      --ink-faint: #6F7B85;
+      --rule:      #2B343D;
+      --rule-soft: #212930;
+      --seam:      #E86376;
+      --chalk:     #6FADCE;
+      --amber:     #D0A44E;
+      --shadow:    none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#0E1318; --card:#161C23; --ink:#E4E9ED; --ink-soft:#A2ADB7;
+    --ink-faint:#6F7B85; --rule:#2B343D; --rule-soft:#212930;
+    --seam:#E86376; --chalk:#6FADCE; --amber:#D0A44E; --shadow:none;
+  }
+  :root[data-theme="light"] {
+    --paper:#E9ECEF; --card:#F5F7F8; --ink:#12171E; --ink-soft:#4C5661;
+    --ink-faint:#7B858F; --rule:#C6CCD3; --rule-soft:#DCE1E6;
+    --seam:#A81D33; --chalk:#23607F; --amber:#8A6414;
+    --shadow:0 1px 0 rgba(18,23,30,.05);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Pretendard", "Segoe UI", system-ui, -apple-system,
+                 "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    font-size: 16px;
+    line-height: 1.68;
+    margin: 0;
+    padding: 0 20px 96px;
+    font-feature-settings: "tnum" 0;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  code, .num, .mono {
+    font-family: "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas,
+                 "Roboto Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- masthead ---------- */
+  .mast { padding: 72px 0 0; border-bottom: 2px solid var(--ink); }
+  .eyebrow {
+    font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 600; margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(34px, 6vw, 54px); line-height: 1.08; letter-spacing: -.028em;
+    font-weight: 800; margin: 0 0 18px; text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 18px; color: var(--ink-soft); max-width: 60ch;
+    margin: 0 0 34px; text-wrap: pretty;
+  }
+  .headline-figures {
+    display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 -2px;
+    border-top: 1px solid var(--rule);
+  }
+  .hf {
+    flex: 1 1 150px; padding: 18px 20px 20px;
+    border-right: 1px solid var(--rule-soft);
+  }
+  .hf:last-child { border-right: 0; }
+  .hf .k { font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+           color: var(--ink-faint); font-weight: 600; }
+  .hf .v { font-size: 30px; font-weight: 700; letter-spacing: -.02em; margin-top: 4px; }
+  .hf .v.gain { color: var(--chalk); }
+  .hf .v.warn { color: var(--seam); }
+  .hf .s  { font-size: 13px; color: var(--ink-faint); }
+
+  /* ---------- sections ---------- */
+  section { margin: 64px 0 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px;
+              border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 26px; }
+  .sec-num { font-size: 12px; font-weight: 700; color: var(--seam);
+             letter-spacing: .06em; flex: 0 0 auto; }
+  h2 { font-size: 25px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+  h3 { font-size: 17px; font-weight: 700; letter-spacing: -.01em;
+       margin: 34px 0 12px; }
+  p { margin: 0 0 16px; max-width: 66ch; text-wrap: pretty; }
+  .lede { font-size: 17px; color: var(--ink-soft); }
+  strong { font-weight: 700; }
+  .hl { color: var(--seam); font-weight: 700; }
+  .hl-c { color: var(--chalk); font-weight: 700; }
+
+  /* ---------- tables ---------- */
+  .scroll { overflow-x: auto; margin: 0 0 22px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 420px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--rule-soft); }
+  thead th {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 700; border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  td.n, th.n { text-align: right; font-family: "SF Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
+               font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tr.total td { border-top: 2px solid var(--ink); border-bottom: 0;
+                font-weight: 700; padding-top: 12px; }
+  .pos { color: var(--chalk); }
+  .neg { color: var(--seam); }
+  .dim { color: var(--ink-faint); }
+
+  /* ---------- ledger ---------- */
+  .ledger { border-top: 2px solid var(--ink); }
+  .row {
+    display: grid; grid-template-columns: 1fr auto; gap: 8px 24px;
+    padding: 20px 0; border-bottom: 1px solid var(--rule-soft); align-items: start;
+  }
+  .row .t { font-size: 17px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 6px; }
+  .row .d { font-size: 14.5px; color: var(--ink-soft); max-width: 62ch; }
+  .row .amt {
+    font-family: "SF Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
+    font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700;
+    white-space: nowrap; text-align: right; letter-spacing: -.02em;
+  }
+  .row .amt small { display: block; font-size: 10.5px; font-weight: 600;
+                    letter-spacing: .1em; text-transform: uppercase;
+                    color: var(--ink-faint); margin-top: 2px; }
+
+  /* ---------- callout ---------- */
+  .note {
+    background: var(--card); border-left: 3px solid var(--seam);
+    padding: 16px 20px; margin: 24px 0; box-shadow: var(--shadow);
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note.calm { border-left-color: var(--chalk); }
+
+  /* ---------- chart ---------- */
+  figure { margin: 0 0 26px; }
+  figcaption { font-size: 13px; color: var(--ink-faint); margin-top: 10px; }
+  svg { display: block; width: 100%; height: auto; }
+  .grid { stroke: var(--rule-soft); stroke-width: 1; }
+  .axis { stroke: var(--rule); stroke-width: 1; }
+  .tick { fill: var(--ink-faint); font-size: 11px;
+          font-family: "SF Mono",Consolas,ui-monospace,monospace; }
+  .lbl  { fill: var(--ink-soft); font-size: 12px; font-weight: 700; }
+
+  /* ---------- pipeline ---------- */
+  .pipe { display: flex; flex-direction: column; gap: 0; margin: 8px 0 24px; }
+  .stage {
+    border: 1px solid var(--rule); background: var(--card);
+    padding: 14px 18px; box-shadow: var(--shadow);
+  }
+  .stage + .stage { border-top: 0; }
+  .stage .sn { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+               color: var(--ink-faint); font-weight: 700; }
+  .stage .sb { font-size: 15px; margin-top: 3px; }
+  .stage .sb code { font-size: 13.5px; background: none; color: var(--chalk); }
+
+  ul { margin: 0 0 18px; padding-left: 20px; max-width: 66ch; }
+  li { margin-bottom: 7px; }
+
+  footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--rule);
+           font-size: 13px; color: var(--ink-faint); }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">LG Aimers Phase 2 · 투구 제구 성공확률 예측 · 데이터 분석 원장</p>
+  <h1>이 대회는 판별력 대회가 아니라<br>캘리브레이션 대회다</h1>
+  <p class="standfirst">
+    1,475,092개 투구를 분석한 결과, 점수를 좌우하는 것은 모델의 정교함이 아니라
+    <strong>2025 시즌 평균을 몇 %p 오차로 맞히느냐</strong>였다.
+    아래는 모든 발견을 대회 점수 단위로 환산한 원장이다.
+  </p>
+  <div class="headline-figures">
+    <div class="hf">
+      <div class="k">베이스라인 LB</div>
+      <div class="v">549.5</div>
+      <div class="s">운영진 RandomForest</div>
+    </div>
+    <div class="hf">
+      <div class="k">전방검증 결과</div>
+      <div class="v gain">711.3</div>
+      <div class="s">2024 폴드 전체 채점</div>
+    </div>
+    <div class="hf">
+      <div class="k">평균 오프셋</div>
+      <div class="v gain">+0.0011</div>
+      <div class="s">예측 0.4872 / 실제 0.4861</div>
+    </div>
+    <div class="hf">
+      <div class="k">추론 시간</div>
+      <div class="v">8.8초</div>
+      <div class="s">245,789행 · 제한 10분</div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="sec-num">01</span><h2>먼저, 점수의 물리학</h2></div>
+  <p class="lede">
+    <code>Score = 100000 × (1 − BS / r(1−r))</code> 에서 예측 평균이 실제 평균과
+    <code>d</code> 만큼 어긋나면, 판별력과 무관하게 그 자체로 점수가 깎인다.
+  </p>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>평균 오프셋 d</th><th class="n">0.005</th><th class="n">0.010</th>
+            <th class="n">0.020</th><th class="n">0.030</th><th class="n">0.040</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>점수 손실</td>
+          <td class="n neg">−10</td><td class="n neg">−40</td><td class="n neg">−160</td>
+          <td class="n neg">−360</td><td class="n neg">−641</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <p>베이스라인이 <strong>549.5점</strong>인 대회다. 평균을 2%p 틀리면 베이스라인 전체가 사라지고,
+    4%p 틀리면 <strong>판별력으로 벌어들인 711점도 대부분 상쇄된다</strong>.
+    그런데 train은 2019~2024이고 test는 <strong>2025</strong>다.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">02</span><h2>시즌 드리프트와 퓨처스 절벽</h2></div>
+  <figure>
+    <svg viewBox="0 0 720 340" role="img" aria-label="2019년부터 2025년까지 1군(R)과 퓨처스(F) 리그의 제구 성공률 추이. R은 0.5495에서 0.4897로 완만히 하락하고, F는 2022년 0.7087에서 2023년 0.4729로 급락한다.">
+      <!-- gridlines -->
+      <line class="grid" x1="70" y1="48.6"  x2="700" y2="48.6"  />
+      <line class="grid" x1="70" y1="95.0"  x2="700" y2="95.0"  />
+      <line class="grid" x1="70" y1="141.4" x2="700" y2="141.4" />
+      <line class="grid" x1="70" y1="187.9" x2="700" y2="187.9" />
+      <line class="grid" x1="70" y1="234.3" x2="700" y2="234.3" />
+      <line class="grid" x1="70" y1="280.7" x2="700" y2="280.7" />
+      <text class="tick" x="60" y="52.6"  text-anchor="end">.70</text>
+      <text class="tick" x="60" y="99.0"  text-anchor="end">.65</text>
+      <text class="tick" x="60" y="145.4" text-anchor="end">.60</text>
+      <text class="tick" x="60" y="191.9" text-anchor="end">.55</text>
+      <text class="tick" x="60" y="238.3" text-anchor="end">.50</text>
+      <text class="tick" x="60" y="284.7" text-anchor="end">.45</text>
+      <line class="axis" x1="70" y1="300" x2="700" y2="300" />
+
+      <!-- x labels -->
+      <text class="tick" x="70"  y="318" text-anchor="middle">2019</text>
+      <text class="tick" x="173" y="318" text-anchor="middle">2020</text>
+      <text class="tick" x="277" y="318" text-anchor="middle">2021</text>
+      <text class="tick" x="380" y="318" text-anchor="middle">2022</text>
+      <text class="tick" x="483" y="318" text-anchor="middle">2023</text>
+      <text class="tick" x="587" y="318" text-anchor="middle">2024</text>
+      <text class="tick" x="690" y="318" text-anchor="middle">2025</text>
+
+      <!-- train/test divider -->
+      <line x1="638" y1="30" x2="638" y2="300" stroke="var(--ink-faint)"
+            stroke-width="1" stroke-dasharray="2 4" />
+      <text class="tick" x="644" y="42">test</text>
+
+      <!-- F line -->
+      <polyline fill="none" stroke="var(--seam)" stroke-width="2.5"
+        points="70,58.5 173,152.8 277,45.0 380,40.5 483,259.4 587,272.1" />
+      <polyline fill="none" stroke="var(--seam)" stroke-width="2.5" stroke-dasharray="5 4"
+        points="587,272.1 690,282.3" />
+      <circle cx="70"  cy="58.5"  r="3.5" fill="var(--seam)" />
+      <circle cx="173" cy="152.8" r="3.5" fill="var(--seam)" />
+      <circle cx="277" cy="45.0"  r="3.5" fill="var(--seam)" />
+      <circle cx="380" cy="40.5"  r="3.5" fill="var(--seam)" />
+      <circle cx="483" cy="259.4" r="3.5" fill="var(--seam)" />
+      <circle cx="587" cy="272.1" r="3.5" fill="var(--seam)" />
+      <circle cx="690" cy="282.3" r="3.5" fill="var(--paper)" stroke="var(--seam)" stroke-width="2.5" />
+
+      <!-- R line -->
+      <polyline fill="none" stroke="var(--chalk)" stroke-width="2.5"
+        points="70,188.3 173,209.3 277,222.4 380,230.8 483,231.4 587,243.8" />
+      <polyline fill="none" stroke="var(--chalk)" stroke-width="2.5" stroke-dasharray="5 4"
+        points="587,243.8 690,254.1" />
+      <circle cx="70"  cy="188.3" r="3.5" fill="var(--chalk)" />
+      <circle cx="173" cy="209.3" r="3.5" fill="var(--chalk)" />
+      <circle cx="277" cy="222.4" r="3.5" fill="var(--chalk)" />
+      <circle cx="380" cy="230.8" r="3.5" fill="var(--chalk)" />
+      <circle cx="483" cy="231.4" r="3.5" fill="var(--chalk)" />
+      <circle cx="587" cy="243.8" r="3.5" fill="var(--chalk)" />
+      <circle cx="690" cy="254.1" r="3.5" fill="var(--paper)" stroke="var(--chalk)" stroke-width="2.5" />
+
+      <!-- cliff annotation -->
+      <line x1="380" y1="52" x2="483" y2="248" stroke="var(--seam)" stroke-width="1"
+            stroke-dasharray="2 3" opacity=".55" />
+      <text class="lbl" x="392" y="140" fill="var(--seam)">라벨 레짐 전환</text>
+      <text class="tick" x="392" y="157" fill="var(--seam)">−0.236</text>
+
+      <text class="lbl" x="80" y="48" fill="var(--seam)">F · 퓨처스리그</text>
+      <text class="lbl" x="80" y="178" fill="var(--chalk)">R · 1군</text>
+    </svg>
+    <figcaption>
+      시즌별 <code>control_success</code> 평균. 점선은 2025 목표 레벨(직전 시즌 −0.011)이며 예측에 실제로 주입한 값이다.
+    </figcaption>
+  </figure>
+  <p>
+    1군(R)은 <span class="hl-c">연 −0.012씩 매끄럽게 하락</span>한다. 반면 퓨처스(F)는
+    2022→2023에 <span class="hl">0.709 → 0.473</span>으로 절벽처럼 떨어진다.
+    2024년에 F와 R 양쪽에 등판한 투수들을 비교하면 F 0.468 / R 0.462로 <strong>실제 투구 차이는 없다</strong>.
+    즉 2022년 이전 F는 투구가 달랐던 게 아니라 <strong>라벨을 매기는 체계가 달랐다</strong>.
+  </p>
+  <p>
+    이 오염된 10%를 학습에서 빼는 것만으로 2024 폴드 점수가
+    <span class="hl-c">93.8 → 492.1</span>로 올랐다. 단일 조치로는 가장 큰 이득이었다.
+  </p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">03</span><h2>발견 원장</h2></div>
+  <p class="lede">모든 실험을 <code>train ≤ Y−1 → eval Y</code> 전방검증으로 측정했다.
+    랜덤 KFold는 드리프트를 통과시켜 버리므로 이 문제에서는 무의미하다.</p>
+
+  <div class="ledger">
+    <div class="row">
+      <div>
+        <div class="t">2022년 이전 F 게임 학습 제외</div>
+        <div class="d">라벨 레짐이 다른 10%를 제거. 포함 시 2023 폴드의 F 구간 점수는 −16,190이었다.</div>
+      </div>
+      <div class="amt pos">+398<small>2024 폴드 총점</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t">파생 피처 32개 추가</div>
+        <div class="d">볼카운트 코드, 플래툰, 경험적 베이즈 수축 성공률, 커리어 대비 최근 폼 편차, 구종 엔트로피 등.</div>
+      </div>
+      <div class="amt pos">+94<small>2024 판별력</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t">정규화 강화 (rounds 500 → 100)</div>
+        <div class="d">leaves 63→31, min_leaf 500→1000. 신호가 약할수록 용량을 줄일수록 좋아졌다.</div>
+      </div>
+      <div class="amt pos">+108<small>2024 판별력</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t">L2 로지스틱 블렌드 (비중 0.35)</div>
+        <div class="d">2023 폴드에서 로지스틱 536.5 &gt; LGBM 490.3. 신호가 거의 선형이라는 증거.</div>
+      </div>
+      <div class="amt pos">+10<small>2폴드 판별력</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t">시드 배깅 5개</div>
+        <div class="d">로짓 공간 평균. 저신호 문제에서 분산 축소가 그대로 점수가 된다.</div>
+      </div>
+      <div class="amt pos">+19<small>2023 판별력</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t">game_type별 레벨 시프트</div>
+        <div class="d">모델 자체의 자동시프트를 상쇄한 뒤 2025 목표평균으로 이동. 아래 04절.</div>
+      </div>
+      <div class="amt pos">+67<small>2024 총점</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t"><span class="dim">기각</span> &nbsp;pitcher_id / batter_id 범주형</div>
+        <div class="d"><code>asof_*</code>가 이미 누수 없는 target encoding 역할을 한다. 순수 과적합.</div>
+      </div>
+      <div class="amt neg">−769<small>2024 판별력</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t"><span class="dim">기각</span> &nbsp;init_score로 레벨 완전 분리</div>
+        <div class="d">리그 레벨을 offset으로 떼어내면 판별력이 깎인다.</div>
+      </div>
+      <div class="amt neg">−48<small>2폴드 판별력</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t"><span class="dim">기각</span> &nbsp;직전 시즌까지 누적 분할통계</div>
+        <div class="d">좌우타 상대·볼카운트 구간별 시대보정 투수 지표. 2024 폴드 +25.6, 2023 폴드 −21.9. 레짐 변화에 취약.</div>
+      </div>
+      <div class="amt dim">±0<small>한쪽만 개선</small></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="t"><span class="dim">기각</span> &nbsp;season 피처 · 시즌 가중 · 단조제약 · 피처 축소</div>
+        <div class="d">2025는 미학습 구간이라 트리가 외삽하지 못한다. 나머지도 노이즈 수준.</div>
+      </div>
+      <div class="amt dim">−22 ~ +4</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">04</span><h2>레벨을 어떻게 통제했나</h2></div>
+  <p>
+    핵심 함정은 <strong>이중 차감</strong>이었다. 모델은 <code>asof_*</code> 피처를 통해 이미 드리프트를
+    일부 따라 내려간다. 여기에 수동 시프트를 그대로 얹으면 과하게 내려간다.
+  </p>
+  <p>
+    그 자동 이동량 <code>Δ_auto</code>를 두 폴드에서 측정했더니 놀랍도록 안정적이었다 —
+    1군 기준 <span class="hl-c">−0.0053, −0.0040</span>. 반면 퓨처스는 <span class="hl">−0.0183</span>으로
+    4배 컸다. 로스터 교체가 잦아 <code>asof</code> 분포가 훨씬 크게 이동하기 때문이다.
+  </p>
+  <div class="note calm">
+    <p><strong>최종 시프트 공식</strong> — 학습 시점에 미리 계산해 저장한다.</p>
+    <p><code>목표 = 2024 실제평균 + DRIFT(−0.011) − Δ_auto(R −0.0046 / F −0.011)</code></p>
+    <p>2024 학습행의 예측 평균을 이 목표로 옮기는 로짓 시프트를 구해두면,
+    2025 데이터에 적용했을 때 자동 이동분이 더해져 정확히 목표 레벨에 착지한다.</p>
+    <p>실제 계산 결과 R은 <code>−0.0395</code>, F는 <code>0.0000</code>이 나왔다.
+    F에 시프트가 없는 이유는 우연이 아니다 — 퓨처스의 자동 이동량이 예상 드리프트와 같아
+    <strong>모델이 스스로 필요한 만큼 내려가기 때문</strong>이다.</p>
+  </div>
+  <h3>DRIFT를 −0.011로 정한 근거</h3>
+  <p>
+    1군의 연도별 변화 5개는 <code>−.0226, −.0141, −.0091, −.0006, −.0134</code>로 평균 −0.0120 (sd 0.0079)이다.
+    2폴드 스윕만 보면 −0.008이 최적으로 보이지만 관측이 2개뿐이라 5년 평균이 더 나은 추정이다.
+    선형회귀 외삽은 백테스트 RMSE 0.022로 <strong>위험했다</strong>(단순 −0.010 규칙은 0.0054).
+  </p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">05</span><h2>피처 구조 — 무엇이 실제로 신호인가</h2></div>
+  <h3>단변량 신호 세기 (BSS 환산)</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>상위 피처</th><th class="n">BSS</th><th>하위 피처</th><th class="n">BSS</th></tr></thead>
+      <tbody>
+        <tr><td><code>pitcher_id</code></td><td class="n">849</td><td><code>balls_before</code></td><td class="n dim">19.6</td></tr>
+        <tr><td><code>asof_pitcher_success_rate</code></td><td class="n">765</td><td><code>strikes_before</code></td><td class="n dim">5.8</td></tr>
+        <tr><td><code>asof_pitcher_prev5_success</code></td><td class="n">672</td><td><code>base_state</code></td><td class="n dim">3.0</td></tr>
+        <tr><td><code>asof_pitcher_reverse_rate</code></td><td class="n">668</td><td><code>outs_before</code></td><td class="n dim">1.5</td></tr>
+        <tr><td><code>asof_batter_success_rate</code></td><td class="n">392</td><td><code>runner_on_1b</code></td><td class="n dim">0.001</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    <strong>투수 정체성이 거의 전부다.</strong> 볼카운트·주자·점수차는 사실상 무의미하다
+    (타깃과의 최대 피어슨 상관 0.084). 타깃 정의가 "가운데 / 크게 빗나감 / 포수 요구 반대" —
+    즉 <strong>커맨드</strong>이므로 상황보다 투수 개인 능력이 지배하는 것이 자연스럽다.
+  </p>
+
+  <h3>중복 · 과잉상관 구조</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>피처 쌍</th><th class="n">r</th><th>처리</th></tr></thead>
+      <tbody>
+        <tr><td><code>away_win_expectancy</code> ↔ <code>home_win_expectancy</code></td><td class="n neg">−1.000</td><td>완전 중복 → 제거</td></tr>
+        <tr><td><code>asof_pitcher_pitchmix_n</code> ↔ <code>asof_pitcher_n</code></td><td class="n neg">1.000</td><td>값이 동일 → 제거</td></tr>
+        <tr><td><code>home_win_expectancy</code> ↔ <code>score_diff_home</code></td><td class="n">0.905</td><td>유지 (비선형 관계)</td></tr>
+        <tr><td><code>prev3_success</code> ↔ <code>prev5_success</code></td><td class="n">0.882</td><td>가중 블렌드로 요약 추가</td></tr>
+        <tr><td><code>reverse_rate</code> ↔ <code>success_rate</code></td><td class="n neg">−0.810</td><td>reverse는 실패의 한 유형</td></tr>
+        <tr><td><code>ball_rate</code> ↔ <code>strike_rate</code></td><td class="n neg">−0.773</td><td>차분 피처 추가</td></tr>
+        <tr><td><code>batter_middle_rate</code> ↔ <code>batter_success</code></td><td class="n neg">−0.536</td><td>유지</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>성능 상한</h3>
+  <p>
+    2024년 투수별 성공률 산포는 sd 0.0455이고 이항잡음 0.0224를 빼면 <strong>참 실력 산포 ≈ 0.040</strong>이다
+    (타자는 0.013). 2024 정답을 알고 있다고 가정한 오라클 점수는 투수 단독 863, 투수×타자손 1,091이다.
+    반면 정직한 홀드아웃(2024 전반기 → 후반기)은 364에 그친다. <strong>현실적 상한은 700~900</strong>이며,
+    현재 판별력 711은 그 구간에 들어와 있다.
+  </p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">06</span><h2>최종 아키텍처</h2></div>
+  <div class="pipe">
+    <div class="stage"><div class="sn">입력</div><div class="sb"><code>test.csv</code> 각 행 · 48컬럼 — 다른 행을 전혀 참조하지 않음</div></div>
+    <div class="stage"><div class="sn">피처</div><div class="sb"><code>build()</code> → 78개 (중복 2개 제거, 파생 32개 추가)</div></div>
+    <div class="stage"><div class="sn">모델 A</div><div class="sb">LightGBM × 5시드 — <code>lr .05 / leaves 31 / min_leaf 1000 / ff .7 / λ₂ 10 / 100 rounds</code></div></div>
+    <div class="stage"><div class="sn">모델 B</div><div class="sb">L2 로지스틱 <code>C = 0.01</code> — 표준화 + 중앙값 대치</div></div>
+    <div class="stage"><div class="sn">블렌드</div><div class="sb"><code>z = 0.65·z_lgb + 0.35·z_lr</code> (로짓 공간)</div></div>
+    <div class="stage"><div class="sn">레벨</div><div class="sb"><code>game_type</code>별 로짓 시프트 — R <code>−0.0395</code> / F <code>0.0000</code></div></div>
+    <div class="stage"><div class="sn">출력</div><div class="sb"><code>sigmoid</code> → <code>output/submission.csv</code></div></div>
+  </div>
+  <ul>
+    <li>학습셋: 2019~2024 전체에서 <strong>2022년 이전 F 행만 제외</strong> (1,369,784 / 1,475,092행)</li>
+    <li><code>season</code>, <code>pitcher_id</code>, <code>batter_id</code> 미사용</li>
+    <li>평가데이터 내부 집계 · 빈도 · target encoding · 행순서 rolling <strong>전무</strong> — 대회 규칙 4항 준수</li>
+    <li>제출 zip 0.8 MB · 추론 8.8초 (245,789행)</li>
+  </ul>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">07</span><h2>전방검증 결과</h2></div>
+  <p class="lede"><code>train ≤ 2023 → eval 2024</code> — 실제 대회(<code>≤2024 → 2025</code>)와 동일한 1년 앞 예측 구조.</p>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>구간</th><th class="n">n</th><th class="n">총점</th><th class="n">판별력</th>
+            <th class="n">예측평균</th><th class="n">실제</th><th class="n">오프셋</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>R · 1군</td><td class="n">223,497</td><td class="n">723.7</td><td class="n">725.1</td>
+            <td class="n">.4916</td><td class="n">.4897</td><td class="n pos">+.0019</td></tr>
+        <tr><td>F · 퓨처스</td><td class="n">30,010</td><td class="n">292.7</td><td class="n">301.8</td>
+            <td class="n">.4545</td><td class="n">.4593</td><td class="n">−.0047</td></tr>
+        <tr class="total"><td>전체</td><td class="n">253,507</td><td class="n">711.3</td><td class="n">711.8</td>
+            <td class="n">.4872</td><td class="n">.4861</td><td class="n pos">+.0011</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    총점과 판별력이 거의 같다는 것은 <strong>레벨 손실이 사실상 0</strong>이라는 뜻이다.
+    캘리브레이션 절차가 의도대로 작동했다.
+  </p>
+  <div class="note">
+    <p><strong>남은 불확실성</strong> — 2025 리그 평균의 추정 표준오차는 약 0.0079다.
+    이것만으로 ±26점의 변동이 불가피하며, 이는 어떤 모델링으로도 줄일 수 없는 하한이다.
+    (평가데이터 평균을 참조하는 보정은 규칙 위반이다.)</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">08</span><h2>착수하지 않은 아이디어</h2></div>
+  <ul>
+    <li><strong>Trackman 연결</strong> — <code>pitcher_trackman_id</code>는 <code>pitcher_id</code>와 체계가 다르다.
+      다만 main 데이터가 경기·투구 순서로 정렬돼 있어 경기 정렬로 ID 매핑을 복구할 수 있다.
+      릴리스포인트 산포는 커맨드의 대리지표가 될 수 있으나,
+      <code>asof_pitcher_success_rate</code>가 이미 결과를 수천 표본으로 직접 측정하므로 잔여 가치는 작을 것으로 본다.</li>
+    <li><strong>콜드스타트 사전값 하향</strong> — <code>asof_pitcher_n &lt; 50</code> 구간에서 실제 0.4725 / 예측 0.5013.
+      경험 적은 투수는 모델 생각보다 실제로 나쁘다. 다만 해당 구간이 5.6%뿐이라 기대 이득 약 3점.</li>
+    <li><strong>시즌 내 월별 레벨 곡선</strong> — 현재는 <code>game_month</code> 피처로 암묵 학습 중.</li>
+  </ul>
+</section>
+
+<footer>
+  train.csv 1,475,092행 × 49컬럼 · trackman_history.csv 1,793,078행 × 30컬럼 분석.
+  모든 점수는 대회 평가식 <code>100000 × (1 − BS/r(1−r))</code> 기준.
+</footer>
+
+</div>
+
+</body>
+</html>

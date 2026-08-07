@@ -1,0 +1,55 @@
+trackman 피처 20개 부착, 전체 커버리지 68.9%
+기본 피처 78개
+
+====================================================================================================
+### Trackman 구위 피처 효과 (판별력, R채점)
+====================================================================================================
+  기본 78개                               2023R:  563.4  2024R:  725.0   평균=  644.2
+  + 릴리스 반복성만 (5개)                      2023R:  557.8  2024R:  735.1   평균=  646.4
+  + Trackman 전체 (22개)                  2023R:  548.6  2024R:  740.8   평균=  644.7
+
+  릴리스만: Δ2023=-5.6  Δ2024=+10.1  두 폴드 모두 개선? False
+  전체:     Δ2023=-14.9  Δ2024=+15.8  두 폴드 모두 개선? False
+
+### Trackman 피처 중요도 (2024 폴드, 전체 구성)
+tm_rel_var_rel_height     0.87%
+tm_rel_var_rel_side       0.56%
+tm_rel_var_extension      0.47%
+tm_m_rel_speed            1.04%
+tm_m_spin_rate            0.88%
+tm_m_induced_vert_break   1.67%
+tm_m_horz_break           1.37%
+tm_m_extension            1.00%
+tm_m_rel_height           0.67%
+tm_m_rel_side             1.11%
+tm_m_zone_speed           0.69%
+tm_v_fastball             0.66%
+tm_sp_fastball            0.43%
+tm_v_breaking             0.53%
+tm_sp_breaking            0.62%
+tm_v_offspeed             0.41%
+tm_sp_offspeed            1.01%
+tm_n_types                0.14%
+tm_velo_sep               0.37%
+tm_prior_n                1.51%
+tm_log_n                  0.18%
+tm_has                    0.00%
+
+  Trackman 피처 gain 합계: 16.17%
+
+### 전체 상위 15
+p_succ_eb200                15.06%
+asof_pitcher_success_rate   12.48%
+asof_pitcher_reverse_rate    8.69%
+p_succ_eb1000                3.91%
+rev_plus_mid                 3.30%
+asof_pitcher_ball_rate       2.88%
+asof_batter_success_rate     2.41%
+hand_combo                   2.06%
+strike_minus_ball            2.03%
+batter_team_id               1.97%
+form_blend                   1.94%
+tm_m_induced_vert_break      1.67%
+b_succ_eb500                 1.57%
+tm_prior_n                   1.51%
+platoon                      1.46%

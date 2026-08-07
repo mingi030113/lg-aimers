@@ -1,0 +1,64 @@
+======================================================================================================================
+### prior 분할통계 추가 효과 (판별력 = 평균고정 점수, R게임 채점)
+======================================================================================================================
+  decay=0.75 k=(400, 400, 800, 300, 200)
+      2023: base=  476.1  +prior=  372.2   Δ=-103.9
+      2024: base=  680.8  +prior=  747.8   Δ= +67.0
+  decay=0.6 k=(400, 400, 800, 300, 200)
+      2023: base=  476.1  +prior=  368.8   Δ=-107.2
+      2024: base=  680.8  +prior=  754.4   Δ= +73.6
+  decay=0.9 k=(400, 400, 800, 300, 200)
+      2023: base=  476.1  +prior=  393.6   Δ= -82.4
+      2024: base=  680.8  +prior=  763.5   Δ= +82.7
+  decay=0.75 k=(1500, 1500, 3000, 1000, 800)
+      2023: base=  476.1  +prior=  341.8   Δ=-134.3
+      2024: base=  680.8  +prior=  753.0   Δ= +72.2
+
+### 새 피처 중요도 (2024 폴드, decay0.75)
+p_bh_split    3.50%
+pteam_n       3.29%
+pteam_dev     1.20%
+pteam_logn    1.02%
+p_cnt_split   0.99%
+b_dev         0.92%
+b_ph_split    0.80%
+p_bh_dev      0.79%
+b_ph_dev      0.77%
+p_run_n       0.60%
+p_run_split   0.57%
+p_bh_n        0.57%
+b_n           0.57%
+p_run_dev     0.56%
+p_cnt_n       0.55%
+b_ph_n        0.47%
+p_cnt_dev     0.46%
+p_dev         0.45%
+p_n           0.35%
+p_bh_logn     0.32%
+p_cnt_logn    0.23%
+b_ph_logn     0.13%
+p_logn        0.13%
+p_run_logn    0.11%
+b_logn        0.10%
+
+전체 상위 20:
+p_succ_eb200                           9.84%
+asof_pitcher_success_rate              8.22%
+asof_pitcher_reverse_rate              6.29%
+p_succ_eb1000                          4.14%
+p_bh_split                             3.50%
+pteam_n                                3.29%
+asof_pitcher_ball_rate                 2.60%
+form_blend                             2.27%
+asof_batter_success_rate               2.12%
+batter_team_id                         2.02%
+rev_plus_mid                           1.77%
+strike_minus_ball                      1.59%
+asof_pitcher_prev1_game_success_rate   1.39%
+mix_entropy                            1.39%
+b_succ_eb500                           1.38%
+asof_pitcher_n                         1.35%
+form_dev5                              1.30%
+asof_pitcher_prev3_game_success_rate   1.29%
+asof_pitcher_prev5_game_success_rate   1.23%
+asof_pitcher_middle_rate               1.20%
