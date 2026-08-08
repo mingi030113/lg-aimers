@@ -63,6 +63,9 @@ python -m unittest discover -s work/codex_v2/tests -p "test_*.py" -v
 - `evaluate_prev_pitcher_residual.py`: 현 2-MLP OOF 잔차에 대한 prior 교차 이전 검사
 - `team_residual.py`: OOF에서만 학습하는 수축 group residual 보정
 - `evaluate_team_residual.py`: batter-team 보정의 연도 교차 이전 및 team-cluster 검사
+- `evaluate_team_residual_v2.py`: 고정 가중치의 연도·반시즌·forward 이전 재검증
+- `TEAM_RESIDUAL_V2_RESULT.md`: 최종 채택 근거, 배포 설정, 제출 ZIP 검증 기록
+- `team_submission/`: 팀 잔차 artifact 생성, 격리 후보 build, runtime 보정
 - `EXPERIMENT_PLAN.md`: 채택 기준과 지금까지의 기각/보류 결과
 
 후보 도구는 어느 것도 champion 모델 파일을 자동으로 변경하지 않습니다.

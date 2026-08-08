@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "artifact_type": "batter_team_probability_residual",
+  "group_col": "batter_team_id",
+  "applies_to_game_type": "R",
+  "correction_space": "probability",
+  "application_order": "after_base_calibration",
+  "unknown_correction": 0.0,
+  "table_file": "team_residual.csv",
+  "table_sha256": "fe3c1546efa08a2e8059b91e588645d8e09b4a385919e7e8cfa849f4997fd2d7",
+  "columns": [
+    "batter_team_id",
+    "residual_correction"
+  ],
+  "n_rows": 10,
+  "allowed_group_values": [
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "max_abs_correction": 0.04,
+  "fit": {
+    "oof_rows": 223497,
+    "global_residual": 6.460144158823266e-17,
+    "shrinkage": 1000.0,
+    "group_counts": {
+      "12": 22133,
+      "13": 22571,
+      "14": 21889,
+      "15": 22457,
+      "16": 22313,
+      "17": 22133,
+      "18": 22194,
+      "19": 22947,
+      "20": 22877,
+      "21": 21983
+    },
+    "description": "2024 R calibrated OOF from final LGBM+Logistic+MLP1+MLP2 recipe; deploy weight 0.50; R rows only",
+    "oof_sha256": "ab7f7745b4f511acc5663be8024e6ca4bad01435f286eb011d1f206b7ccefe01",
+    "base_meta_sha256": "d4fb764b0950608f60c3b45a2ece5036ca81620d7120bce3c46fd141c100ca13",
+    "target_col": "control_success",
+    "prediction_col": "prediction"
+  }
+}

@@ -160,6 +160,49 @@ def validate_meta(meta: dict[str, Any]) -> tuple[list[str], list[str]]:
     if use_mlp3:
         expected.append("mlp3.npz")
 
+    team = meta.get("team_residual")
+    if team is not None:
+        team_keys = {
+            "enabled",
+            "group_col",
+            "applies_to_game_type",
+            "weight",
+            "correction_space",
+            "application_order",
+            "unknown_correction",
+            "table_file",
+            "manifest_file",
+        }
+        if not isinstance(team, dict) or set(team) != team_keys:
+            fail("meta.team_residual keys differ from the allowlist")
+        if not isinstance(team["enabled"], bool):
+            fail("meta.team_residual.enabled must be boolean")
+        if team["group_col"] != "batter_team_id":
+            fail("meta.team_residual.group_col must be batter_team_id")
+        if team["applies_to_game_type"] != "R":
+            fail("meta.team_residual must apply only to R")
+        weight = finite_number(team["weight"], "meta.team_residual.weight")
+        if not 0.0 <= weight <= 1.0:
+            fail("meta.team_residual.weight must be in [0, 1]")
+        if team["correction_space"] != "probability":
+            fail("meta.team_residual correction must be in probability space")
+        if team["application_order"] != "after_base_calibration":
+            fail("meta.team_residual must run after base calibration")
+        if finite_number(
+            team["unknown_correction"], "meta.team_residual.unknown_correction"
+        ) != 0.0:
+            fail("meta.team_residual.unknown_correction must be zero")
+        for key in ("table_file", "manifest_file"):
+            name = team[key]
+            if (
+                not isinstance(name, str)
+                or not SAFE_PRIOR_NAME.fullmatch(name)
+                or Path(name).name != name
+            ):
+                fail(f"unsafe meta.team_residual.{key}: {name!r}")
+        if team["enabled"]:
+            expected.extend([team["table_file"], team["manifest_file"]])
+
     prior_names: list[str] = []
     if boolean_flag(meta, "use_prior"):
         raw_names = meta.get("prior_tables")
@@ -360,6 +403,99 @@ def validate_generic_csv(path: Path) -> dict[str, Any]:
     return {"kind": "prior_table", "rows": rows, "columns": header}
 
 
+def validate_team_residual(model_dir: Path, config: dict[str, Any]) -> dict[str, Any]:
+    manifest_path = model_dir / config["manifest_file"]
+    table_path = model_dir / config["table_file"]
+    manifest = load_json(manifest_path)
+    expected_keys = {
+        "schema_version",
+        "artifact_type",
+        "group_col",
+        "applies_to_game_type",
+        "correction_space",
+        "application_order",
+        "unknown_correction",
+        "table_file",
+        "table_sha256",
+        "columns",
+        "n_rows",
+        "allowed_group_values",
+        "max_abs_correction",
+        "fit",
+    }
+    if set(manifest) != expected_keys:
+        fail("team residual manifest keys differ from the allowlist")
+    if manifest["schema_version"] != 1:
+        fail("unsupported team residual manifest schema")
+    if manifest["artifact_type"] != "batter_team_probability_residual":
+        fail("unexpected team residual artifact type")
+    for key in (
+        "group_col",
+        "applies_to_game_type",
+        "correction_space",
+        "application_order",
+        "unknown_correction",
+        "table_file",
+    ):
+        if manifest[key] != config[key]:
+            fail(f"team residual manifest/config mismatch: {key}")
+    if manifest["columns"] != ["batter_team_id", "residual_correction"]:
+        fail("team residual table column allowlist mismatch")
+    if manifest["table_sha256"] != sha256_path(table_path):
+        fail("team residual table SHA-256 mismatch")
+    n_rows = positive_int(manifest["n_rows"], "team residual manifest.n_rows")
+    max_abs = finite_number(
+        manifest["max_abs_correction"], "team residual manifest.max_abs_correction"
+    )
+    if not 0.0 < max_abs <= 0.10:
+        fail("team residual max_abs_correction must be in (0, 0.10]")
+    allowed = manifest["allowed_group_values"]
+    if (
+        not isinstance(allowed, list)
+        or len(allowed) != n_rows
+        or any(isinstance(v, bool) or not isinstance(v, int) for v in allowed)
+        or len(set(allowed)) != len(allowed)
+    ):
+        fail("team residual allowed_group_values is invalid")
+    if not isinstance(manifest["fit"], dict):
+        fail("team residual manifest.fit must be an object")
+
+    seen: set[int] = set()
+    corrections: list[float] = []
+    try:
+        with table_path.open("r", encoding="utf-8-sig", newline="") as fh:
+            reader = csv.DictReader(fh)
+            if reader.fieldnames != ["batter_team_id", "residual_correction"]:
+                fail("team residual CSV columns/order differ from allowlist")
+            for line_no, row in enumerate(reader, start=2):
+                try:
+                    raw_team = float(row["batter_team_id"])
+                    correction = float(row["residual_correction"])
+                except (TypeError, ValueError):
+                    fail(f"team residual CSV has non-numeric value at line {line_no}")
+                if not math.isfinite(raw_team) or raw_team != math.floor(raw_team):
+                    fail(f"team residual team ID is invalid at line {line_no}")
+                team_id = int(raw_team)
+                if team_id in seen:
+                    fail(f"team residual duplicate team ID: {team_id}")
+                if not math.isfinite(correction) or abs(correction) > max_abs + 1e-15:
+                    fail(f"team residual correction is invalid at line {line_no}")
+                seen.add(team_id)
+                corrections.append(correction)
+    except (OSError, UnicodeDecodeError, csv.Error) as exc:
+        fail(f"cannot inspect team residual table: {exc}")
+    if len(seen) != n_rows or sorted(seen) != sorted(allowed):
+        fail("team residual table rows differ from manifest")
+    return {
+        "kind": "batter_team_probability_residual",
+        "rows": n_rows,
+        "weight": float(config["weight"]),
+        "applies_to_game_type": config["applies_to_game_type"],
+        "minimum": min(corrections),
+        "maximum": max(corrections),
+    }
+
+
 def regular_files(directory: Path) -> set[str]:
     names: set[str] = set()
     try:
@@ -402,6 +538,9 @@ def validate_model_dir(model_dir: Path) -> tuple[dict[str, Any], list[str], dict
     for name in prior_names:
         filename = f"prior_{name}.csv"
         checks[filename] = validate_generic_csv(model_dir / filename)
+    if meta.get("team_residual", {}).get("enabled", False):
+        team = meta["team_residual"]
+        checks[team["table_file"]] = validate_team_residual(model_dir, team)
     return meta, expected, checks
 
 

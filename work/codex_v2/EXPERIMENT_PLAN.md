@@ -72,8 +72,18 @@ Public leaderboard submissions are confirmation only, not a weight-search loop.
   2024 was 0.028 and transferred to 2023 at -1.34 points, with pitcher-clustered
   95% interval [-4.78, +1.64]. Keep the implementation for reproducibility, but
   do not add the feature to the champion based on its strong standalone signal.
-- Batter-team OOF residual correction (`shrinkage=1000`): promising point
-  estimates (+36.33 for 2023->2024 and +59.20 for 2024->2023), but rejected for
-  now because there are only ten team clusters. Team-clustered 95% intervals
-  include zero ([-35.27, +156.69] and [-29.01, +211.96]), and leave-one-team-out
-  deltas can be negative. Preserve it as a research candidate; do not ship it.
+- Batter-team OOF residual correction v1 (`shrinkage=1000`, full weight): the
+  initial annual-only audit was held back because there are only ten team
+  clusters and its cluster intervals included zero. That result is retained as
+  the conservative baseline, not treated as the final decision.
+- Batter-team OOF residual correction v2 (`shrinkage=1000`, fixed weight 0.50):
+  adopted as a submission challenger after expanding the validation to annual,
+  chronological half-season, and forward transfer views. All 8/8 forward views
+  improved. The key fixed-weight deltas were +39.33 (2023 all -> 2024 all),
+  +54.50 (2023 early -> late), +45.16 (2023 late -> 2024 early), and +33.16
+  (2024 early -> late); 47/50 leave-one-correction-out checks remained positive.
+  The deployment table is fitted once from 2024 regular-season OOF, applied only
+  to `game_type == "R"` after base calibration, and never uses test-row
+  aggregation. Weight 0.75 had the stronger local point estimate, but 0.50 was
+  selected before submission as the smaller transfer-stable weight. This is a
+  local-validation decision, not a new public leaderboard score.
