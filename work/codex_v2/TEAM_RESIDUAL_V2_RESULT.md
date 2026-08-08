@@ -46,8 +46,9 @@ estimated correction without discarding a consistently positive signal.
 ## Submission artifact
 
 - File: `submit_team_residual_w050.zip`
-- Size: `1,899,665` bytes
-- SHA-256: `878761afa9f0f4cd27e53a31f13cc2f490eeebeb053fa0422f6759528fbf6ce5`
+- Size: `1,899,709` bytes
+- SHA-256: `86be08dbeb10c3f81df7781ec4a1de782348c908492a4bdfb8a0565b38f45ffb`
+- Build-source commit: `8441ff2f51a18699b40ecc097e791033e0b4e45f`
 - Members: 15 strict-allowlisted files, including MLP2 and excluding inactive
   MLP3.
 

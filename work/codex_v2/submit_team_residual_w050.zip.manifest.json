@@ -1,0 +1,205 @@
+{
+  "bundle_allowlist": [
+    "artifact_manifest.json",
+    "model/lgb_0.txt",
+    "model/lgb_1.txt",
+    "model/lgb_2.txt",
+    "model/lgb_3.txt",
+    "model/lgb_4.txt",
+    "model/linear.npz",
+    "model/meta.json",
+    "model/mlp.npz",
+    "model/mlp2.npz",
+    "model/team_residual.csv",
+    "model/team_residual_manifest.json",
+    "model/tm_prior.csv",
+    "requirements.txt",
+    "script.py"
+  ],
+  "created_at_utc": "2026-08-08T07:15:05.431442+00:00",
+  "files": [
+    {
+      "path": "model/lgb_0.txt",
+      "sha256": "73fce59e74b3982fe927efeb5b0ce2888a50266d3c6215674611fe1ae134ff5a",
+      "size": 369782
+    },
+    {
+      "path": "model/lgb_1.txt",
+      "sha256": "cdef96ef886155d43c4cc3db637da186b4de2945d2dde2a891026a39974a7be2",
+      "size": 369829
+    },
+    {
+      "path": "model/lgb_2.txt",
+      "sha256": "13373056359e1a9c051a080b1522d4dfbb4246c1b62164a03f177c61519d0012",
+      "size": 369870
+    },
+    {
+      "path": "model/lgb_3.txt",
+      "sha256": "fdd2181a2d8be309879c8dbc908200693bc58f01be650268addce1f4294105ed",
+      "size": 369777
+    },
+    {
+      "path": "model/lgb_4.txt",
+      "sha256": "d28ca8f90f75bb411fc72b75c2114da28632da117ca91ea3cc4b618f8aac040d",
+      "size": 369900
+    },
+    {
+      "path": "model/linear.npz",
+      "sha256": "f48f7fe481e7a8e591dcee9a68b7129febb343ffc395394dad27aaedb7c8f0c5",
+      "size": 4430
+    },
+    {
+      "path": "model/meta.json",
+      "sha256": "222ab8cef2d528547a9023cd82d471373cdad1468ae0a97f6f6e13bd7718b52a",
+      "size": 3450
+    },
+    {
+      "path": "model/mlp.npz",
+      "sha256": "40627d9ea72d5f8cb3560a9d8b0cf2199c772920637664358cd4715367fd3f8a",
+      "size": 95536
+    },
+    {
+      "path": "model/mlp2.npz",
+      "sha256": "ae6bc78d5ea8a3dc309d5f8ad28a7724710742f3d3b26b8ae6a1b4599998e123",
+      "size": 904038
+    },
+    {
+      "path": "model/team_residual.csv",
+      "sha256": "fe3c1546efa08a2e8059b91e588645d8e09b4a385919e7e8cfa849f4997fd2d7",
+      "size": 290
+    },
+    {
+      "path": "model/team_residual_manifest.json",
+      "sha256": "fe45912c6c9c3330bfe023701fc9188bf881db07220337aff16de1f0978faac4",
+      "size": 1358
+    },
+    {
+      "path": "model/tm_prior.csv",
+      "sha256": "6f650b3bbe6a4c900c53731ba46c0495239af9b2d64803ce876de0a71dbd973b",
+      "size": 1265283
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "756644e053d84644159a129a134a137d5131ac427b51bd665795243637598b54",
+      "size": 60
+    },
+    {
+      "path": "script.py",
+      "sha256": "3b681cb1529a94029e558e5ea58f175a04fc4ee019b23365625e10cf008241c4",
+      "size": 25224
+    }
+  ],
+  "git_commit": "8441ff2f51a18699b40ecc097e791033e0b4e45f",
+  "model_checks": {
+    "lgb_0.txt": {
+      "kind": "lightgbm",
+      "n_features": 100
+    },
+    "lgb_1.txt": {
+      "kind": "lightgbm",
+      "n_features": 100
+    },
+    "lgb_2.txt": {
+      "kind": "lightgbm",
+      "n_features": 100
+    },
+    "lgb_3.txt": {
+      "kind": "lightgbm",
+      "n_features": 100
+    },
+    "lgb_4.txt": {
+      "kind": "lightgbm",
+      "n_features": 100
+    },
+    "linear.npz": {
+      "arrays": {
+        "coef": [
+          100
+        ],
+        "intercept": [
+          1
+        ],
+        "med": [
+          100
+        ],
+        "mu": [
+          100
+        ],
+        "sd": [
+          100
+        ]
+      },
+      "kind": "linear"
+    },
+    "mlp.npz": {
+      "kind": "mlp",
+      "layer_shapes": [
+        [
+          100,
+          32
+        ],
+        [
+          32,
+          16
+        ],
+        [
+          16,
+          1
+        ]
+      ],
+      "n_layers": 3,
+      "n_seeds": 3
+    },
+    "mlp2.npz": {
+      "kind": "mlp2",
+      "layer_shapes": [
+        [
+          100,
+          32
+        ],
+        [
+          32,
+          16
+        ],
+        [
+          16,
+          1
+        ]
+      ],
+      "n_layers": 3,
+      "n_seeds": 3,
+      "quantiles_shape": [
+        1000,
+        100
+      ]
+    },
+    "team_residual.csv": {
+      "applies_to_game_type": "R",
+      "kind": "batter_team_probability_residual",
+      "maximum": 0.03532999968429851,
+      "minimum": -0.009540812083268024,
+      "rows": 10,
+      "weight": 0.5
+    },
+    "tm_prior.csv": {
+      "kind": "trackman_prior",
+      "rows": 3523,
+      "unique_keys": 3523
+    }
+  },
+  "model_meta_sha256": "222ab8cef2d528547a9023cd82d471373cdad1468ae0a97f6f6e13bd7718b52a",
+  "model_summary": {
+    "n_features": 100,
+    "n_lgb_seeds": 5,
+    "train_rows": 499032,
+    "use_mlp": true,
+    "use_mlp2": true,
+    "use_mlp3": false,
+    "use_trackman": true
+  },
+  "schema_version": 1,
+  "script_check": {
+    "bytes": 24643,
+    "lines": 582
+  }
+}
